@@ -1,0 +1,11 @@
+{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <script src="{% static 'testtechnique/js/jquery-3.6.0.js' %}"></script>
+    </head>
+    <body>
+        {% block content %}{% endblock %}
+    </body>
+</html>

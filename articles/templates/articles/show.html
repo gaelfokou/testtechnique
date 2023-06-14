@@ -1,0 +1,63 @@
+{% extends "articles/base.html" %}
+
+{% block title %}{{ data.titre }}{% endblock %}
+
+{% block content %}
+    <h2>{{ data.titre }}</h2>
+    <p>{{ data.description }}</p>
+    <h1>Commentaires</h1>
+    <form method="post" id="form">
+        {% csrf_token %}
+        <input type="text" name="auteur" placeholder="Auteur"><br>
+        <textarea name="description" placeholder="Commentaire"></textarea><br>
+        <input type="submit" value="Créer">
+    </form>
+    <ul id="results"></ul>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#form').submit(function(e) {
+                e.preventDefault();
+                var auteur = $('input[name="auteur"]').val();
+                var description = $('textarea[name="description"]').val();
+                var data = {auteur:auteur, description:description};
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'commentaires:index' data.id %}",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(data){
+                        $('input[name="auteur"]').val('');
+                        $('textarea[name="description"]').val('');
+                        all();
+                    },
+                    failure: function(errMsg) {
+                    }
+                });
+            });
+
+            all();
+        });
+
+        function all() {
+            var $results = $('#results');
+            $results.empty();
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'commentaires:all' data.id %}",
+                dataType: "json",
+                success: function(data){
+                    $.each(data, function(i, result) {
+                        var res = '<li>'
+                        res += result.id + '- ' + result.description + ' (' + result.auteur + ')';
+                        res += '</li>';
+                        $results.append(res);
+                    });
+                },
+                failure: function(errMsg) {
+                }
+            });
+        }
+    </script>
+{% endblock %}
